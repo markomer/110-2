@@ -1,0 +1,36 @@
+
+
+
+# install packages
+
+python -m pip install <name>
+
+# create the venv
+python -m venv venv
+
+# activate the venv
+
+win:
+    venv\Scripts\activate
+
+
+mac:
+    source venv/bin/activate
+
+start server:
+    python name of file
+
+# packages for DB connection
+python -m pip install Flask-PyMongo
+python -m pip install "pymongo[srv]"
+python -m pip install certifi
+
+
+
+# git commands
+
+git add .
+git commit -m "110 #2"
+git push
+
+git remote -v
