@@ -1,4 +1,5 @@
 import json
+from winreg import QueryReflectionKey
 from flask import Flask, abort, request  # from file or mdule import X
 from mock_data import catalog  # fn or something...
 from config import db
@@ -13,11 +14,9 @@ def home():
   return "Hello from Flask"
 
 
-
 @app.route("/me") # add /me to the URL
 def about_me():
   return "Mark Omer"
-
 
 
 #####################################
@@ -31,9 +30,9 @@ def about_me():
 def get_catalog():
 
   """ return "catalog data"
-  return json.dumps(prod) # this is how parse..."""
-  # return json.dumps(catalog)
-
+  return json.dumps(prod) # this is how to parse...
+  #return json.dumps(catalog)"""
+  
   products = []
   cursor = db.products.find({}) # cursor is collection
 
@@ -42,24 +41,21 @@ def get_catalog():
     products.append(prod)
 
   return json.dumps(products)
+  
 
 @app.route("/api/catalog", methods=["post"])
 def save_product():
   product = request.get_json()  # returns data (payload) from the 
   
-  # set a unique _id on product
+  """ set a unique _id on product
   # product["_id"] = 2
-  # catalog.append(product) # save it to the data base
+  # catalog.append(product) # save it to the data base"""
 
   db.products.insert_one(product) # into Mongo db
   print(product)
-
-  # fix _id
+    # fix _id
   product["_id"] = str(product["_id"])
-
-
-
-  # crash...
+    # crash...
   return json.dumps(product)
   
 
@@ -95,19 +91,11 @@ def get_by_id(id):
   prod = db.products.find_one({ "_id": ObjectId(id) })
 
   if not prod:
-
+    # not found, return an error 404
     return abort(404, "No product with such id")
 
   prod["_id"] = str(prod["_id"])
   return json.dumps(prod)
-
-  # find the product with _id is equal to id
-  #for prod in catalog:
-    #if prod["_id"] == id:
-      #return json.dumps(prod)
-
-  # not found, return an error 404
-  #return abort(404, "No product with such id")
 
 
 # GET /api/product/cheapest
@@ -116,6 +104,7 @@ def get_by_id(id):
 
 @app.route("/api/product/cheapest")
 def cheapest_product():
+
   solution = catalog[0]
   for prod in catalog:
     if prod["price"] < solution["price"]:
@@ -187,16 +176,21 @@ def some_numbers():
 # 2 Save coupon
 # 3 Get a coupon based on its code
 
+allCoupons = []
+
 @app.route("/api/couponCode", methods=["GET"])
 def get_coupons():
-
   coupons = []
   cursor = db.coupons.find({})
+  for coups in cursor:
+    coups["_id"] = str(coups["_id"])
+    coupons.append(coups)
   
-  for coup in cursor:
-    coup["_id"] = str(coup["_id"])
-    coupons.append(coup)
   return json.dumps(coupons)
+  
+  # return json.dumps(allCoupons)
+
+
 
 # create the POST /api/couponCode
 # get the coupon from the request 
@@ -204,31 +198,35 @@ def get_coupons():
 # and add it to all coupons
 # return the coupon as json
 
-@app.route("/api/couponCode", methods=["POST"])
 # OR @app.post("/api/couponCode")
+@app.route("/api/couponCode", methods=["POST"])
 def save_coupon():
   coupon = request.get_json()
-  
   db.coupons.insert_one(coupon)
-  print(coupon)
 
   coupon["_id"] = str(coupon["_id"])
+  return json.dumps(coupon)
+  
+  #coupon = request.get_json()
+  #coupon["_id"] = 42
 
+  #allCoupons.append(coupon)
+
+  #return json.dumps(coupon)
+
+
+@app.route("/api/couponCode/<code>")
+def get_coupon_by_code(code): 
+  coupon = db.couponCodes.find_one({"code": code})
+  if not coupon:
+    return abort(404, "Invalid Code")
+
+  coupon["_id"] = str(coupon["_id"])
   return json.dumps(coupon)
 
-@app.route("/api/couponCode/<codes>")
-def coupon_code(code): 
 
-  coupons = []
-  cursor = db.coupons.find({"code": code})
 
-  for coup in cursor:
-    coup["_id"] = str(coup["_id"])
-    coupons.append(coup)
-
-  return json.dumps(coupons)
-
-######### my version below #############
+######### my prior version below #############
 
 allTheCoupons = []
 
