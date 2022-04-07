@@ -217,7 +217,7 @@ def save_coupon():
 
 @app.route("/api/couponCode/<code>")
 def get_coupon_by_code(code): 
-  coupon = db.couponCodes.find_one({"code": code})
+  coupon = db.coupons.find_one({"code": code})
   if not coupon:
     return abort(404, "Invalid Code")
 
