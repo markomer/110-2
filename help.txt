@@ -30,7 +30,7 @@ python -m pip install certifi
 # git commands
 
 git add .
-git commit -m "110 #2"
+git commit -m "110-2"
 git push
 
 git remote -v
