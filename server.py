@@ -4,10 +4,11 @@ from flask import Flask, abort, request  # from file or mdule import X
 from mock_data import catalog  # fn or something...
 from config import db
 from bson import ObjectId
+from flask_cors import CORS
 
 
 app = Flask("Server")
-
+CORS(app)
 
 @app.route("/")
 def home():
@@ -200,7 +201,7 @@ def get_coupons():
 @app.route("/api/couponCode", methods=["POST"])
 def save_coupon():
   coupon = request.get_json()
-
+  print(coupon)
   # must contain code, discout
   if not "code" in coupon or not "discount" in coupon:
     return abort(400, "Code and Discount must be entered.")
